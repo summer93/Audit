@@ -5,6 +5,8 @@ import json
 from audit import models
 import random,string
 import datetime
+from audit import task_handler
+
 # Create your views here.
 
 @login_required
@@ -83,3 +85,36 @@ def get_token(request):
 @login_required
 def multi_cmd(request):
     return render(request,'multi_cmd.html')
+
+
+@login_required
+def multitask(request):
+
+    task_obj = task_handler.Task(request)
+    if task_obj.is_valid():
+        result = task_obj.run()
+        return HttpResponse(json.dumps({'task_id':result}))
+    return HttpResponse(json.dumps(task_obj.errors))
+
+
+@login_required
+def multitask_result(request):
+    task_id = request.GET.get('task_id')
+    # [ {
+    #     'task_log_id':23.
+    #     'hostname':
+    #     'ipaddr'
+    #     'username'
+    #     'status'
+    # } ]
+
+
+    task_obj = models.Task.objects.get(id=task_id)
+
+    results = list(task_obj.tasklog_set.values('id','status',
+                                'host_user_bind__host__hostname',
+                                'host_user_bind__host__ip_addr',
+                                'result'
+                                ))
+
+    return HttpResponse(json.dumps(results))

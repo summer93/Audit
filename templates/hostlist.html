@@ -1,8 +1,9 @@
 {% extends 'index.html' %}
 
 
+
 {% block content-container %}
-    {% csrf_token %}
+{#    {% csrf_token %}#}
     <div id="page-title">
         <h1 class="page-header text-overflow">主机列表</h1>
 
@@ -85,8 +86,8 @@
 function  GetToken(self,bind_host_id) {
 
     $.post("{% url 'get_token' %}", {'bind_host_id':bind_host_id,'csrfmiddlewaretoken':"{{ csrf_token }}"},function(callback){
-        console.log(callback);
-        var data = JSON.parse(callback);
+        console.log(callback)
+        var data = JSON.parse(callback)
         $(self).parent().next().text(data.token);
     });//end post
 }
@@ -96,14 +97,14 @@ function GetHostlist(gid,self) {
     $.get("{% url 'get_host_list' %}",{'gid':gid},function(callback){
 
         var data  = JSON.parse(callback);
-        console.log(data);
-        var trs = '';
+        console.log(data)
+        var trs = ''
         $.each(data,function (index,i) {
             var tr = "<tr><td>" + i.host__hostname + "</td><td>" + i.host__ip_addr +"</td><td>" + i.host__idc__name
                     +"</td><td>" + i.host__port  + "</td><td>" + i.host_user__username+ "</td><td><a class='btn btn-info' onclick=GetToken(this,'"+i.id +"')>Token</a>Login</td><td ></td></tr>";
             trs += tr
 
-        });
+        })
         $("#hostlist").html(trs);
 
 
